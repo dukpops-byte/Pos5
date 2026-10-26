@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: pos-loyalty-postgres
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn POS:app --workers 1 --threads 4 --timeout 120
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pos-loyalty-db
+          property: connectionString
+      - key: POS_SECRET_KEY
+        generateValue: true
+      - key: INITIAL_SUPERADMIN_PASSWORD
+        generateValue: true
+
+databases:
+  - name: pos-loyalty-db
+    databaseName: pos_loyalty
+    user: pos_loyalty_user
